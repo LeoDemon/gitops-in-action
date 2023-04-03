@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: canary-ingress-canary
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    # using canary strategy
+    nginx.ingress.kubernetes.io/canary: "true"
+    # 20% of the traffic goes to canary service; 80% goes to prod service
+    nginx.ingress.kubernetes.io/canary-weight: "20"
+    # the request's header which contains `X-Canary` will go to canary service
+    nginx.ingress.kubernetes.io/canary-by-header: "X-Canary"
+spec:
+  rules:
+  - host: "canary.demo"
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: canary-service
+            port:
+              number: 80
+
